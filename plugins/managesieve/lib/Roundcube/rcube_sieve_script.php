@@ -351,6 +351,25 @@ class rcube_sieve_script
                     $i++;
                 }
             }
+            
+            if(!function_exists("array_column"))
+            {
+
+                function array_column($array,$column_name)
+                {
+
+                    return array_map(function($element) use($column_name){return $element[$column_name];}, $array);
+
+                }
+
+            }
+            
+            // Do not send Vacation-Reqponstes to Mailing-Lists
+            if(array_search("vacation",array_column($rule['actions'],"type")) !== false){
+                $tests[] = "not header :matches \"Precedence\" \"list\"";
+                $tests[] = "not header :matches \"Precedence\" \"bulk\"";
+                $tests[] = "not exists \"List-Id\"";
+            }
 
             // disabled rule: if false #....
             if (!empty($tests)) {
